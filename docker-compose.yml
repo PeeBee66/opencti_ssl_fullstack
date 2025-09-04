@@ -4,7 +4,7 @@ services:
     restart: always
     volumes:
       - redisdata:/data
-      - /home/opencti-admin/OpenCTI_SSL_STACK/ssl/redis:/tls:ro
+      - ${FOLDER}/ssl/redis:/tls:ro
     ports:
       - "6380:6380"
     command: redis-server --port 0 --tls-port 6380 --tls-cert-file /tls/redis.crt --tls-key-file /tls/redis.key --tls-ca-cert-file /tls/ca.crt --tls-auth-clients no
@@ -44,7 +44,7 @@ services:
         hard: -1
     volumes:
       - esdata:/usr/share/elasticsearch/data
-      - /home/opencti-admin/OpenCTI_SSL_STACK/ssl/elasticsearch:/usr/share/elasticsearch/config/certs:ro
+      - ${FOLDER}/ssl/elasticsearch:/usr/share/elasticsearch/config/certs:ro
     networks:
       - opencti
 
@@ -61,7 +61,7 @@ services:
     command: server /data --console-address ":9001" --certs-dir /root/.minio/certs
     volumes:
       - s3data:/data
-      - /home/opencti-admin/OpenCTI_SSL_STACK/ssl/minio:/root/.minio/certs:ro
+      - ${FOLDER}/ssl/minio:/root/.minio/certs:ro
     healthcheck:
       test: ["CMD", "curl", "-k", "-f", "https://localhost:9000/minio/health/live"]
       interval: 10s
@@ -82,10 +82,10 @@ services:
       - RABBITMQ_NODENAME=rabbit01@localhost
     volumes:
       - type: bind
-        source: /home/opencti-admin/OpenCTI_SSL_STACK/config/rabbitmq.conf
+        source: ${FOLDER}/config/rabbitmq.conf
         target: /etc/rabbitmq/rabbitmq.conf
       - amqpdata:/var/lib/rabbitmq
-      - /home/opencti-admin/OpenCTI_SSL_STACK/ssl/rabbitmq:/etc/ssl/certs:ro
+      - ${FOLDER}/ssl/rabbitmq:/etc/ssl/certs:ro
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 30s
@@ -153,8 +153,8 @@ services:
       - SMTP__PORT=25
       - PROVIDERS__LOCAL__STRATEGY=LocalStrategy
     volumes:
-      - /home/opencti-admin/OpenCTI_SSL_STACK/ssl/opencti:/opt/opencti/ssl:ro
-      - /home/opencti-admin/OpenCTI_SSL_STACK/ssl/ca:/opt/opencti/ssl-ca:ro
+      - ${FOLDER}/ssl/opencti:/opt/opencti/ssl:ro
+      - ${FOLDER}/ssl/ca:/opt/opencti/ssl-ca:ro
  #   depends_on:
  #     redis:
  #       condition: service_healthy
